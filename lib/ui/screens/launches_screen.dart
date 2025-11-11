@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../data/models/launch.dart';
 import '../../data/services/spacex_api_service.dart';
+import '../widgets/error_box.dart';
 import '../widgets/launch_card.dart';
 import '../widgets/launch_list_item.dart';
+import '../widgets/view_mode_toggle.dart';
 import 'favorites_screen.dart';
 
 enum LaunchesViewMode { list, grid }
@@ -76,7 +78,7 @@ class _LaunchesScreenState extends State<LaunchesScreen> {
                   );
                 }
                 if (snapshot.hasError) {
-                  return _ErrorBox(
+                  return ErrorBox(
                     message: 'Erreur lors du chargement du prochain lancement',
                   );
                 }
@@ -98,24 +100,11 @@ class _LaunchesScreenState extends State<LaunchesScreen> {
                       'Derniers lancements',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: SegmentedButton<LaunchesViewMode>(
-                        segments: const [
-                          ButtonSegment(
-                            value: LaunchesViewMode.grid,
-                            icon: Icon(Icons.grid_view),
-                          ),
-                          ButtonSegment(
-                            value: LaunchesViewMode.list,
-                            icon: Icon(Icons.list),
-                          ),
-                        ],
-                        selected: {_mode},
-                        showSelectedIcon: false,
-                        onSelectionChanged: (set) =>
-                            setState(() => _mode = set.first),
-                      ),
+                    ViewModeToggle<LaunchesViewMode>(
+                      selectedMode: _mode,
+                      gridMode: LaunchesViewMode.grid,
+                      listMode: LaunchesViewMode.list,
+                      onModeChanged: (mode) => setState(() => _mode = mode),
                     ),
                   ],
                 ),
@@ -129,7 +118,7 @@ class _LaunchesScreenState extends State<LaunchesScreen> {
                   );
                 }
                 if (snapshot.hasError) {
-                  return _ErrorBox(
+                  return ErrorBox(
                     message: 'Erreur lors du chargement des lancements',
                   );
                 }
@@ -166,30 +155,6 @@ class _LaunchesScreenState extends State<LaunchesScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _ErrorBox extends StatelessWidget {
-  final String message;
-  const _ErrorBox({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        spacing: 8,
-        children: [
-          Icon(Icons.error_outline, color: Theme.of(context).colorScheme.error),
-          Expanded(child: Text(message)),
-        ],
       ),
     );
   }

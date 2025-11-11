@@ -1,15 +1,11 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 import '../../data/models/launch.dart';
-import '../../data/providers/favorites_provider.dart';
-import '../screens/launch_details_screen.dart';
+import '../utils/date_formatters.dart';
+import '../utils/navigation_utils.dart';
+import 'favorite_button.dart';
 import 'patch_image.dart';
-
-final DateFormat _dateFormatDate = DateFormat.yMMMMd('fr_FR');
-final DateFormat _dateFormatTime = DateFormat.Hm('fr_FR');
 
 class LaunchCard extends StatelessWidget {
   final Launch launch;
@@ -28,14 +24,7 @@ class LaunchCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: onTap ??
-            () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => LaunchDetailsScreen(launch: launch),
-                ),
-              );
-            },
+        onTap: onTap ?? () => navigateToLaunchDetails(context, launch),
         child: SizedBox(
           height: 220,
           child: Stack(
@@ -71,29 +60,7 @@ class LaunchCard extends StatelessWidget {
               Positioned(
                 top: 8,
                 right: 8,
-                child: Consumer<FavoritesProvider>(
-                  builder: (context, favoritesProvider, child) {
-                    final isFavorite = favoritesProvider.isFavorite(launch.id);
-                    return Material(
-                      color: Colors.black.withValues(alpha: 0.25),
-                      borderRadius: BorderRadius.circular(12),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          favoritesProvider.toggleFavorite(launch.id);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            isFavorite ? Icons.favorite : Icons.favorite_border,
-                            color: isFavorite ? Colors.pink : Colors.white,
-                            size: 18,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                child: FavoriteButton.compact(launchId: launch.id),
               ),
               // Bottom content (header, title, description, date/time)
               Positioned(
@@ -127,7 +94,7 @@ class LaunchCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     Text(
-                      '${_dateFormatDate.format(launch.dateUtc.toLocal())} • ${_dateFormatTime.format(launch.dateUtc.toLocal())}',
+                      DateFormatters.formatDateTime(launch.dateUtc),
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: Colors.white.withValues(alpha: 0.85),
                       ),

@@ -6,16 +6,18 @@ import 'data/providers/favorites_provider.dart';
 import 'data/services/onboarding_service.dart';
 import 'ui/screens/launches_screen.dart';
 import 'ui/screens/onboarding_screen.dart';
+import 'ui/theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('fr_FR');
   
-  // Set system navigation bar color (bottom bar on Android/iOS)
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.transparent, // Transparent or set a specific color
-      systemNavigationBarIconBrightness: Brightness.dark, // For dark icons (use Brightness.light for light icons)
+      systemNavigationBarColor: Color(0xFF0A0E27), 
+      systemNavigationBarIconBrightness: Brightness.light, 
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light, 
     ),
   );
   
@@ -31,17 +33,7 @@ class MainApp extends StatelessWidget {
       create: (_) => FavoritesProvider(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: true,
-          colorSchemeSeed: Colors.indigo,
-          appBarTheme: const AppBarTheme(
-            // Change this color to customize the AppBar background
-            backgroundColor: Colors.indigo, // You can use any color here
-            foregroundColor: Colors.white, // Text and icon color
-            elevation: 0, // Remove shadow (set to 0 or any value)
-            centerTitle: false,
-          ),
-        ),
+        theme: AppTheme.themeData,
         home: const _InitialScreen(),
       ),
     );

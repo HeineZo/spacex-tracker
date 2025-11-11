@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 import '../../data/models/launch.dart';
 import '../../data/providers/favorites_provider.dart';
 import '../../data/services/spacex_api_service.dart';
+import '../widgets/error_box.dart';
 import '../widgets/launch_card.dart';
 import '../widgets/launch_list_item.dart';
+import '../widgets/view_mode_toggle.dart';
 
 enum FavoritesViewMode { list, grid }
 
@@ -51,30 +53,27 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        title: const Text('Favoris'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: SegmentedButton<FavoritesViewMode>(
-              segments: const [
-                ButtonSegment(
-                  value: FavoritesViewMode.grid,
-                  icon: Icon(Icons.grid_view),
-                ),
-                ButtonSegment(
-                  value: FavoritesViewMode.list,
-                  icon: Icon(Icons.list),
-                ),
-              ],
-              selected: {_mode},
-              showSelectedIcon: false,
-              onSelectionChanged: (set) =>
-                  setState(() => _mode = set.first),
-            ),
-          ),
-        ],
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Consumer<FavoritesProvider>(
+          builder: (context, favoritesProvider, child) {
+            final hasFavorites = favoritesProvider.favoriteIds.isNotEmpty;
+            return AppBar(
+              centerTitle: false,
+              title: const Text('Favoris'),
+              actions: hasFavorites
+                  ? [
+                      ViewModeToggle<FavoritesViewMode>(
+                        selectedMode: _mode,
+                        gridMode: FavoritesViewMode.grid,
+                        listMode: FavoritesViewMode.list,
+                        onModeChanged: (mode) => setState(() => _mode = mode),
+                      ),
+                    ]
+                  : null,
+            );
+          },
+        ),
       ),
       body: Consumer<FavoritesProvider>(
         builder: (context, favoritesProvider, child) {
@@ -109,8 +108,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
-                  return _ErrorBox(
+                  return ErrorBox(
                     message: 'Erreur lors du chargement des favoris',
+                    margin: const EdgeInsets.all(16),
                   );
                 }
                 final launches = snapshot.data ?? [];
@@ -189,28 +189,4 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 }
 
-class _ErrorBox extends StatelessWidget {
-  final String message;
-  const _ErrorBox({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.errorContainer,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        spacing: 8,
-        children: [
-          Icon(Icons.error_outline, color: Theme.of(context).colorScheme.error),
-          Expanded(child: Text(message)),
-        ],
-      ),
-    );
-  }
-}
 

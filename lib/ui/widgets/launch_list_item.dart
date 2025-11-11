@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/models/launch.dart';
 import '../../data/providers/favorites_provider.dart';
-import '../screens/launch_details_screen.dart';
+import '../utils/date_formatters.dart';
+import '../utils/navigation_utils.dart';
+import 'favorite_snackbar.dart';
 import 'patch_image.dart';
-
-final DateFormat _dateFormatDate = DateFormat.yMMMMd('fr_FR');
-final DateFormat _dateFormatTime = DateFormat.Hm('fr_FR');
 
 class LaunchListItem extends StatelessWidget {
   final Launch launch;
@@ -65,14 +63,14 @@ class LaunchListItem extends StatelessWidget {
             await favoritesProvider.removeFavorite(launch.id);
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Retiré des favoris')),
+                FavoriteSnackBar.removed(launch.id, favoritesProvider),
               );
             }
           } else {
             await favoritesProvider.addFavorite(launch.id);
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Ajouté aux favoris')),
+                FavoriteSnackBar.added(launch.id, favoritesProvider, context),
               );
             }
           }
@@ -83,14 +81,7 @@ class LaunchListItem extends StatelessWidget {
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: InkWell(
-          onTap: onTap ??
-              () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => LaunchDetailsScreen(launch: launch),
-                  ),
-                );
-              },
+          onTap: onTap ?? () => navigateToLaunchDetails(context, launch),
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -156,7 +147,7 @@ class LaunchListItem extends StatelessWidget {
                         ],
                       ),
                       Text(
-                        '${_dateFormatDate.format(launch.dateUtc.toLocal())} • ${_dateFormatTime.format(launch.dateUtc.toLocal())}',
+                        DateFormatters.formatDateTime(launch.dateUtc),
                         style: theme.textTheme.bodySmall,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

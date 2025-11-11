@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart' as intl;
-import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/models/launch.dart';
-import '../../data/providers/favorites_provider.dart';
+import '../utils/date_formatters.dart';
 import '../widgets/details_bottom_sheet.dart';
 import '../widgets/expandable_details_text.dart';
+import '../widgets/favorite_button.dart';
 import '../widgets/patch_image.dart';
-
-final intl.DateFormat _dateFormatTime = intl.DateFormat.Hm('fr_FR');
-final intl.DateFormat _dateFormatFull = intl.DateFormat.yMMMMd('fr_FR');
 
 class LaunchDetailsScreen extends StatelessWidget {
   final Launch launch;
@@ -50,30 +46,7 @@ class LaunchDetailsScreen extends StatelessWidget {
             expandedHeight: 280,
             pinned: true,
             actions: [
-              Consumer<FavoritesProvider>(
-                builder: (context, favoritesProvider, child) {
-                  final isFavorite = favoritesProvider.isFavorite(launch.id);
-                  return IconButton(
-                    icon: Icon(
-                      isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: isFavorite ? Colors.pink : Colors.white,
-                    ),
-                    onPressed: () {
-                      favoritesProvider.toggleFavorite(launch.id);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            isFavorite
-                                ? 'Retiré des favoris'
-                                : 'Ajouté aux favoris',
-                          ),
-                          duration: const Duration(seconds: 1),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+              FavoriteButton.icon(launchId: launch.id),
             ],
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.symmetric(
@@ -115,7 +88,7 @@ class LaunchDetailsScreen extends StatelessWidget {
                         ),
                       if (!isCollapsed) ...[
                         Text(
-                          '${_dateFormatFull.format(launch.dateUtc.toLocal())} • ${_dateFormatTime.format(launch.dateUtc.toLocal())}',
+                          DateFormatters.formatDateTime(launch.dateUtc),
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.85),
                             fontSize: theme.textTheme.labelSmall?.fontSize,
