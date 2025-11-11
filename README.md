@@ -4,22 +4,21 @@
     <br>
 </h1>
 
-<h4 align="center">Application mobile Flutter pour suivre les lancements SpaceX🛰️</h4>
+<h4 align="center">Application mobile Flutter pour suivre les lancements SpaceX 🛰️</h4>
 
 <p align="center">
   <a href="#✨-fonctionnalités">Fonctionnalités</a> •
   <a href="#🛠️-installation">Installation</a> •
   <a href="#🕹️-technologies">Technologies</a> •
-  <a href="#📱-aperçu">Aperçu</a> •
   <a href="#🤠-crédits">Crédits</a>
 </p>
 
 ## ✨ Fonctionnalités
 
-[x] Affichage des lancements
-[x] Détails d'un lancement
-[x] Système de favoris
-[x] Onboarding utilisateur
+- [x] Affichage des lancements
+- [x] Détails d'un lancement
+- [x] Système de favoris
+- [x] Onboarding utilisateur
 
 
 ## 🛠️ Installation
